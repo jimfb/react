@@ -18,3 +18,8 @@ examples/shared/*.js
 test/the-files-to-test.generated.js
 *.log*
 chrome-user-data
+war/react/
+war/WEB-INF/deploy/
+gwt-unitCache/
+war/WEB-INF/classes/
+test-classes/
