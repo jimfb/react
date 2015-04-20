@@ -15,6 +15,7 @@ var mocks = require('mocks');
 
 var React;
 var ReactInstanceMap;
+var ReactComponentRenderer;
 var ReactTestUtils;
 var reactComponentExpect;
 
@@ -25,6 +26,7 @@ describe('ReactCompositeComponent-state', function() {
   beforeEach(function() {
     React = require('React');
     ReactInstanceMap = require('ReactInstanceMap');
+    ReactComponentRenderer = require('ReactComponentRenderer');
     ReactTestUtils = require('ReactTestUtils');
     reactComponentExpect = require('reactComponentExpect');
 
@@ -137,14 +139,17 @@ describe('ReactCompositeComponent-state', function() {
     document.body.appendChild(container);
 
     var stateListener = mocks.getMockFunction();
-    var instance = React.render(
-      <TestComponent stateListener={stateListener} />,
-      container,
+    var renderer = new ReactComponentRenderer(
+      TestComponent,
+      container);
+    renderer.setProps(
+      {stateListener: stateListener},
       function peekAtInitialCallback() {
         this.peekAtState('initial-callback');
       }
     );
-    instance.setProps(
+    var instance = renderer.component;
+    renderer.setProps(
       {nextColor: 'green'},
       instance.peekAtCallback('setProps')
     );

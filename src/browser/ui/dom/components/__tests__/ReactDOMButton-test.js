@@ -17,64 +17,69 @@ var mocks = require('mocks');
 
 describe('ReactDOMButton', function() {
   var React;
+  var ReactComponentRenderer;
   var ReactTestUtils;
 
   var onClick = mocks.getMockFunction();
 
-  function expectClickThru(button) {
+  function expectClickThru(buttonRenderer) {
     onClick.mockClear();
-    ReactTestUtils.Simulate.click(React.findDOMNode(button));
+    ReactTestUtils.Simulate.click(React.findDOMNode(buttonRenderer.component));
     expect(onClick.mock.calls.length).toBe(1);
   }
 
-  function expectNoClickThru(button) {
+  function expectNoClickThru(buttonRenderer) {
     onClick.mockClear();
-    ReactTestUtils.Simulate.click(React.findDOMNode(button));
+    ReactTestUtils.Simulate.click(React.findDOMNode(buttonRenderer.component));
     expect(onClick.mock.calls.length).toBe(0);
   }
 
-  function mounted(button) {
-    button = ReactTestUtils.renderIntoDocument(button);
-    return button;
+  function mounted(props) {
+    var container = document.createElement('div');
+    var buttonRenderer = new ReactComponentRenderer('button', container);
+    buttonRenderer.setProps(props);
+    return buttonRenderer;
   }
 
   beforeEach(function() {
     React = require('React');
+    ReactComponentRenderer = require('ReactComponentRenderer');
     ReactTestUtils = require('ReactTestUtils');
   });
 
   it('should forward clicks when it starts out not disabled', function() {
-    expectClickThru(mounted(<button onClick={onClick} />));
+    expectClickThru(mounted({onClick: onClick}));
   });
 
   it('should not forward clicks when it starts out disabled', function() {
     expectNoClickThru(
-      mounted(<button disabled={true} onClick={onClick} />)
+      mounted({disabled: true, onClick: onClick})
     );
   });
 
   it('should forward clicks when it becomes not disabled', function() {
-    var btn = mounted(<button disabled={true} onClick={onClick} />);
-    btn.setProps({disabled: false});
-    expectClickThru(btn);
+    var btnRenderer = mounted({disabled: true, onClick: onClick});
+    btnRenderer.setProps({disabled: false});
+    expectClickThru(btnRenderer);
   });
 
   it('should not forward clicks when it becomes disabled', function() {
-    var btn = mounted(<button onClick={onClick} />);
-    btn.setProps({disabled: true});
-    expectNoClickThru(btn);
+    var btnRenderer = mounted({onClick: onClick});
+    btnRenderer.setProps({disabled: true});
+    expectNoClickThru(btnRenderer);
   });
 
   it('should work correctly if the listener is changed', function() {
-    var btn = mounted(
-      <button disabled={true} onClick={function() {}} />
-    );
+    var btnRenderer = mounted({
+      disabled: true,
+      onClick: function() {}
+    });
 
-    btn.setProps({
+    btnRenderer.setProps({
       disabled: false,
       onClick: onClick
     });
 
-    expectClickThru(btn);
+    expectClickThru(btnRenderer);
   });
 });

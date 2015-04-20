@@ -19,22 +19,26 @@ describe('ReactDOMSelect', function() {
   var React;
   var ReactLink;
   var ReactTestUtils;
+  var ReactComponentRenderer;
+  var defaultAnimalChildren;
 
   beforeEach(function() {
     React = require('React');
     ReactLink = require('ReactLink');
     ReactTestUtils = require('ReactTestUtils');
+    ReactComponentRenderer = require('ReactComponentRenderer');
+    defaultAnimalChildren = [
+      <option value="monkey">A monkey!</option>,
+      <option value="giraffe">A giraffe!</option>,
+      <option value="gorilla">A gorilla!</option>
+    ];
   });
 
   it('should allow setting `defaultValue`', function() {
-    var stub =
-      <select defaultValue="giraffe">
-        <option value="monkey">A monkey!</option>
-        <option value="giraffe">A giraffe!</option>
-        <option value="gorilla">A gorilla!</option>
-      </select>;
-    stub = ReactTestUtils.renderIntoDocument(stub);
-    var node = React.findDOMNode(stub);
+    var container = document.createElement('div');
+    var stub = new ReactComponentRenderer('select', container);
+    stub.setProps({children: defaultAnimalChildren, defaultValue: 'giraffe'});
+    var node = React.findDOMNode(stub.component);
 
     expect(node.value).toBe('giraffe');
 
@@ -70,14 +74,14 @@ describe('ReactDOMSelect', function() {
   });
 
   it('should allow setting `defaultValue` with multiple', function() {
-    var stub =
-      <select multiple={true} defaultValue={['giraffe', 'gorilla']}>
-        <option value="monkey">A monkey!</option>
-        <option value="giraffe">A giraffe!</option>
-        <option value="gorilla">A gorilla!</option>
-      </select>;
-    stub = ReactTestUtils.renderIntoDocument(stub);
-    var node = React.findDOMNode(stub);
+    var container = document.createElement('div');
+    var stub = new ReactComponentRenderer('select', container);
+    stub.setProps({
+      children: defaultAnimalChildren,
+      multiple: true,
+      defaultValue: ['giraffe', 'gorilla']
+    });
+    var node = React.findDOMNode(stub.component);
 
     expect(node.options[0].selected).toBe(false);  // monkey
     expect(node.options[1].selected).toBe(true);  // giraffe
@@ -92,14 +96,10 @@ describe('ReactDOMSelect', function() {
   });
 
   it('should allow setting `value`', function() {
-    var stub =
-      <select value="giraffe">
-        <option value="monkey">A monkey!</option>
-        <option value="giraffe">A giraffe!</option>
-        <option value="gorilla">A gorilla!</option>
-      </select>;
-    stub = ReactTestUtils.renderIntoDocument(stub);
-    var node = React.findDOMNode(stub);
+    var container = document.createElement('div');
+    var stub = new ReactComponentRenderer('select', container);
+    stub.setProps({children: defaultAnimalChildren, defaultValue: 'giraffe'});
+    var node = React.findDOMNode(stub.component);
 
     expect(node.value).toBe('giraffe');
 
@@ -117,14 +117,14 @@ describe('ReactDOMSelect', function() {
   });
 
   it('should allow setting `value` with multiple', function() {
-    var stub =
-      <select multiple={true} value={['giraffe', 'gorilla']}>
-        <option value="monkey">A monkey!</option>
-        <option value="giraffe">A giraffe!</option>
-        <option value="gorilla">A gorilla!</option>
-      </select>;
-    stub = ReactTestUtils.renderIntoDocument(stub);
-    var node = React.findDOMNode(stub);
+    var container = document.createElement('div');
+    var stub = new ReactComponentRenderer('select', container);
+    stub.setProps({
+      children: defaultAnimalChildren,
+      multiple: true,
+      defaultValue: ['giraffe', 'gorilla']
+    });
+    var node = React.findDOMNode(stub.component);
 
     expect(node.options[0].selected).toBe(false);  // monkey
     expect(node.options[1].selected).toBe(true);  // giraffe
@@ -154,8 +154,11 @@ describe('ReactDOMSelect', function() {
   });
 
   it('should reset child options selected when they are changed and `value` is set', function() {
-    var stub = <select multiple={true} value={["a", "b"]} />;
-    stub = ReactTestUtils.renderIntoDocument(stub);
+    var container = document.createElement('div');
+    var stub = new ReactComponentRenderer('select', container);
+    stub.setProps({multiple: true, value: ["a", "b"]});
+    var node = React.findDOMNode(stub.component);
+
 
     stub.setProps({
       children: [
@@ -164,8 +167,6 @@ describe('ReactDOMSelect', function() {
         <option value="c">c</option>
       ]
     });
-
-    var node = React.findDOMNode(stub);
 
     expect(node.options[0].selected).toBe(true);  // a
     expect(node.options[1].selected).toBe(true);  // b
@@ -203,14 +204,11 @@ describe('ReactDOMSelect', function() {
   });
 
   it('should allow switching to multiple', function() {
-    var stub =
-      <select defaultValue="giraffe">
-        <option value="monkey">A monkey!</option>
-        <option value="giraffe">A giraffe!</option>
-        <option value="gorilla">A gorilla!</option>
-      </select>;
-    stub = ReactTestUtils.renderIntoDocument(stub);
-    var node = React.findDOMNode(stub);
+    var container = document.createElement('div');
+    var stub = new ReactComponentRenderer('select', container);
+    stub.setProps({children: defaultAnimalChildren, defaultValue: 'giraffe'});
+    var node = React.findDOMNode(stub.component);
+
 
     expect(node.options[0].selected).toBe(false);  // monkey
     expect(node.options[1].selected).toBe(true);  // giraffe
@@ -225,14 +223,15 @@ describe('ReactDOMSelect', function() {
   });
 
   it('should allow switching from multiple', function() {
-    var stub =
-      <select multiple={true} defaultValue={['giraffe', 'gorilla']}>
-        <option value="monkey">A monkey!</option>
-        <option value="giraffe">A giraffe!</option>
-        <option value="gorilla">A gorilla!</option>
-      </select>;
-    stub = ReactTestUtils.renderIntoDocument(stub);
-    var node = React.findDOMNode(stub);
+    var container = document.createElement('div');
+    var stub = new ReactComponentRenderer('select', container);
+    stub.setProps({
+      children: defaultAnimalChildren,
+      defaultValue: ['giraffe', 'gorilla'],
+      multiple: true
+    });
+    var node = React.findDOMNode(stub.component);
+
 
     expect(node.options[0].selected).toBe(false);  // monkey
     expect(node.options[1].selected).toBe(true);  // giraffe
@@ -248,14 +247,12 @@ describe('ReactDOMSelect', function() {
   });
 
   it('should remember value when switching to uncontrolled', function() {
-    var stub =
-      <select value={'giraffe'}>
-        <option value="monkey">A monkey!</option>
-        <option value="giraffe">A giraffe!</option>
-        <option value="gorilla">A gorilla!</option>
-      </select>;
-    stub = ReactTestUtils.renderIntoDocument(stub);
-    var node = React.findDOMNode(stub);
+    var container = document.createElement('div');
+    var stub = new ReactComponentRenderer('select', container);
+    stub.setProps({children: defaultAnimalChildren, value: 'giraffe'});
+
+    var node = React.findDOMNode(stub.component);
+
 
     expect(node.options[0].selected).toBe(false);  // monkey
     expect(node.options[1].selected).toBe(true);  // giraffe
@@ -269,14 +266,10 @@ describe('ReactDOMSelect', function() {
   });
 
   it('should remember updated value when switching to uncontrolled', function() {
-    var stub =
-      <select value={'giraffe'}>
-        <option value="monkey">A monkey!</option>
-        <option value="giraffe">A giraffe!</option>
-        <option value="gorilla">A gorilla!</option>
-      </select>;
-    stub = ReactTestUtils.renderIntoDocument(stub);
-    var node = React.findDOMNode(stub);
+    var container = document.createElement('div');
+    var stub = new ReactComponentRenderer('select', container);
+    stub.setProps({children: defaultAnimalChildren, value: 'giraffe'});
+    var node = React.findDOMNode(stub.component);
 
     stub.setProps({value: 'gorilla'});
 

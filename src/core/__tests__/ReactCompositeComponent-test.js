@@ -20,6 +20,7 @@ var ReactPropTypes;
 var ReactServerRendering;
 var ReactTestUtils;
 var ReactUpdates;
+var ReactComponentRenderer;
 
 var reactComponentExpect;
 var mocks;
@@ -37,6 +38,7 @@ describe('ReactCompositeComponent', function() {
     ReactMount = require('ReactMount');
     ReactServerRendering = require('ReactServerRendering');
     ReactUpdates = require('ReactUpdates');
+    ReactComponentRenderer = require('ReactComponentRenderer');
 
     MorphingComponent = React.createClass({
       getInitialState: function() {
@@ -354,18 +356,16 @@ describe('ReactCompositeComponent', function() {
       }
     });
 
-    var instance = <Component />;
-    expect(instance.setProps).not.toBeDefined();
-
-    instance = React.render(instance, container);
+    var renderer = new ReactComponentRenderer(Component, container);
+    var instance = renderer.component;
     expect(function() {
-      instance.setProps({value: 1});
+      renderer.setProps({value: 1});
     }).not.toThrow();
     expect(console.error.calls.length).toBe(0);
 
-    React.unmountComponentAtNode(container);
+    renderer.unmount();
     expect(function() {
-      instance.setProps({value: 2});
+      renderer.setProps({value: 2});
     }).not.toThrow();
 
     expect(console.error.calls.length).toBe(1);
