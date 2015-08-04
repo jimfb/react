@@ -11,6 +11,7 @@
 
 'use strict';
 
+var ReactComponentLogger = require('ReactComponentLogger');
 var DOMProperty = require('DOMProperty');
 var ReactBrowserEventEmitter = require('ReactBrowserEventEmitter');
 var ReactCurrentOwner = require('ReactCurrentOwner');
@@ -506,6 +507,7 @@ var ReactMount = {
   },
 
   _renderSubtreeIntoContainer: function(parentComponent, nextElement, container, callback) {
+    ReactComponentLogger.startRender(nextElement);
     invariant(
       ReactElement.isValidElement(nextElement),
       'React.render(): Invalid component element.%s',
@@ -596,6 +598,7 @@ var ReactMount = {
     if (callback) {
       callback.call(component);
     }
+    ReactComponentLogger.endRender();
     return component;
   },
 

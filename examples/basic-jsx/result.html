@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Basic Example with JSX</title>
+    <link rel="stylesheet" href="../shared/css/base.css" />
+  </head>
+  <body>
+    <h1>Extracted Performance Test from Production</h1>
+    <div id="container">
+
+    <script src="../shared/thirdparty/es5-shim.min.js"></script>
+    <script src="../shared/thirdparty/es5-sham.min.js"></script>
+    <script src="../shared/thirdparty/console-polyfill.js"></script>
+    <script src="../../build/react.js"></script>
+    <script src="../../build/JSXTransformer.js"></script>
+
+    <script type="text/jsx;harmony=true">
+
+
+
+function reElement(obj, seen)
+{
+  if(seen == null) seen = new Map();
+  if(seen.has(obj)) return obj;
+  else seen.set(obj, true);
+  if(obj == null) return obj;
+  if(typeof obj === 'string') return obj;
+  if(typeof obj === 'number') return obj;
+  if(typeof obj === 'function') return obj;
+  if(Array.isArray(obj))
+  {
+    obj.map(function(elem){reElement(elem, seen);});
+    return obj;
+  }
+  if(obj._mymagicrewrite)
+  {
+    reElement(obj.props, seen);
+    var element = React.createElement(eval(obj.name), obj.props);
+    for(key in element)
+    {
+      obj[key] = element[key];
+    }
+    return obj;
+  }
+  Object.keys(obj).map(function(key, index) {
+    reElement(obj[key], seen);
+  });
+  return obj;
+}
+
+function deElement(obj)
+{
+  if(obj == null) return obj;
+  if(typeof obj === 'string') return obj;
+  if(typeof obj === 'number') return obj;
+  if(typeof obj === 'function') return obj;
+  if(Array.isArray(obj)) return obj.map(function(elem){return deElement(elem);});
+  if(obj.type != null)
+  {
+    var element = obj;
+    var elementName = typeof element.type === 'string' ? "'"+element.type+"'" : classNameMap.get(element);
+    return {"_mymagicrewrite": true, "name": elementName, "props": deElement(element.props)};
+  }
+  var newobj = {};
+  Object.keys(obj).map(function(key, index) {
+   newobj[key] = deElement(obj[key]);
+  });
+  return newobj;
+}
+
+function refunctionize(obj)
+{
+  if(obj == null) return obj;
+  if(obj === "%%%%NOISE%%%%") return function(){};
+  if(typeof obj === 'string') return obj;
+  if(typeof obj === 'number') return obj;
+  if(typeof obj === 'function') return obj;
+  if(Array.isArray(obj)) return obj.map(function(elem){return refunctionize(elem);});
+  var newobj = {};
+  Object.keys(obj).map(function(key, index) {
+   newobj[key] = refunctionize(obj[key]);
+  });
+  return newobj;
+}
+
+function defunctionize(obj)
+{
+  if(obj == null) return obj;
+  if(typeof obj === 'string') return obj;
+  if(typeof obj === 'number') return obj;
+  if(typeof obj === 'function') return "%%%%NOISE%%%%";
+  if(Array.isArray(obj)) return obj.map(function(elem){return defunctionize(elem);});
+  var newobj = {};
+  Object.keys(obj).map(function(key, index) {
+   newobj[key] = defunctionize(obj[key]);
+  });
+  return newobj;
+}
+</script>
+
+
+
+    <script src="definitions.js" type="text/jsx;harmony=true"></script>
+    <script type="text/jsx;harmony=true">
+
+var container = document.getElementById('container');
+var component = React.createElement(UnknownComponent4881);
+
+console.profile("Initial Render");
+        React.render(component, container);
+console.profileEnd();
+
+  // Unmount, in preperation for next test (clean render with cache)
+  React.unmountComponentAtNode(container);
+
+
+
+console.profile("Cached Render");
+
+        React.render(
+          <UnknownComponent4881 />,
+          container
+        );
+
+console.profileEnd();
+
+
+
+
+console.profile("Cached No-op Update");
+
+        React.render(
+          <UnknownComponent4881 />,
+          container
+        );
+
+console.profileEnd();
+
+    </script>
+  </body>
+</html>

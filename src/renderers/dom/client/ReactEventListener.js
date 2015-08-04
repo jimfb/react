@@ -128,10 +128,10 @@ function handleTopLevelWithPath(bookKeeping) {
       );
 
       // Jump to the root of this React render tree
-      while (currentPathElementID !== newRootID) {
+      var container = ReactMount.findReactContainerForID(currentPathElementID);
+      var parent = ReactMount.getFirstReactDOM(container);
+      while (i < path.length && path[i] !== parent) {
         i++;
-        currentPathElement = path[i];
-        currentPathElementID = ReactMount.getID(currentPathElement);
       }
     }
   }

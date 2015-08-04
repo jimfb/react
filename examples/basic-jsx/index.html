@@ -28,24 +28,47 @@
     <script src="../shared/thirdparty/console-polyfill.js"></script>
     <script src="../../build/react.js"></script>
     <script src="../../build/JSXTransformer.js"></script>
-    <script type="text/jsx">
-      var ExampleApplication = React.createClass({
-        render: function() {
-          var elapsed = Math.round(this.props.elapsed  / 100);
-          var seconds = elapsed / 10 + (elapsed % 10 ? '' : '.0' );
-          var message =
-            'React has been successfully running for ' + seconds + ' seconds.';
+    <script type="text/jsx;harmony=true">
 
-          return <p>{message}</p>;
-        }
-      });
-      var start = new Date().getTime();
-      setInterval(function() {
+var TodoList = React.createClass({
+  render: function() {
+    var createItem = function(itemText, index) {
+      return <li key={index + itemText}>{itemText}</li>;
+    };
+    return <ul>{this.props.items.map(createItem)}</ul>;
+  }
+});
+var TodoApp = React.createClass({
+  getInitialState: function() {
+    return {items: [], text: ''};
+  },
+  onChange: function(e) {
+    this.setState({text: e.target.value});
+  },
+  handleSubmit: function(e) {
+    e.preventDefault();
+    var nextItems = this.state.items.concat([this.state.text]);
+    var nextText = '';
+    this.setState({items: nextItems, text: nextText});
+  },
+  render: function() {
+    return (
+      <div>
+        <h3>TODO</h3>
+        <TodoList items={this.state.items} />
+        <form onSubmit={this.handleSubmit}>
+          <input onChange={this.onChange} value={this.state.text} />
+          <button>{'Add #' + (this.state.items.length + 1)}</button>
+        </form>
+      </div>
+    );
+  }
+});
+
         React.render(
-          <ExampleApplication elapsed={new Date().getTime() - start} />,
+          <TodoApp />,
           document.getElementById('container')
         );
-      }, 50);
     </script>
   </body>
 </html>

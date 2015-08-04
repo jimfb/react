@@ -11,7 +11,9 @@
 
 'use strict';
 
+
 var ReactComponentEnvironment = require('ReactComponentEnvironment');
+var ReactComponentLogger = require('ReactComponentLogger');
 var ReactCurrentOwner = require('ReactCurrentOwner');
 var ReactElement = require('ReactElement');
 var ReactInstanceMap = require('ReactInstanceMap');
@@ -20,12 +22,15 @@ var ReactPropTypeLocations = require('ReactPropTypeLocations');
 var ReactPropTypeLocationNames = require('ReactPropTypeLocationNames');
 var ReactReconciler = require('ReactReconciler');
 var ReactUpdateQueue = require('ReactUpdateQueue');
+var ReactComponentLogger = require('ReactComponentLogger');
 
 var assign = require('Object.assign');
 var emptyObject = require('emptyObject');
 var invariant = require('invariant');
 var shouldUpdateReactComponent = require('shouldUpdateReactComponent');
 var warning = require('warning');
+
+
 
 function getDeclarationErrorAddendum(component) {
   var owner = component._currentElement._owner || null;
@@ -136,8 +141,8 @@ var ReactCompositeComponentMixin = {
         '%s(...): No `render` method found on the returned component ' +
         'instance: you may have forgotten to define `render` in your ' +
         'component or you may have accidentally tried to render an element ' +
-        'whose type is a function that isn\'t a React component.',
-        Component.displayName || Component.name || 'Component'
+        'whose type is a function that isn\'t a React component.%s;',
+        Component.displayName || Component.name || 'Component', Object.keys(inst)
       );
     }
 
@@ -712,7 +717,10 @@ var ReactCompositeComponentMixin = {
    */
   _renderValidatedComponentWithoutOwnerOrContext: function() {
     var inst = this._instance;
+    ReactComponentLogger.perfStartRender();
     var renderedComponent = inst.render();
+    ReactComponentLogger.perfEndRender();
+   // ReactComponentLogger.log(this._currentElement, renderedComponent);
     if (__DEV__) {
       // We allow auto-mocks to proceed as if they're returning null.
       if (typeof renderedComponent === 'undefined' &&
