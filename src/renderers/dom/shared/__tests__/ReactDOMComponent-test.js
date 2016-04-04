@@ -482,21 +482,28 @@ describe('ReactDOMComponent', function() {
       expect(node.removeAttribute.mock.calls.length).toBe(2);
     });
 
-    it('should not incur unnecessary DOM mutations for string properties', function() {
+    it('should not incur unnecessary DOM mutations for string attributes', function() {
       var container = document.createElement('div');
       ReactDOM.render(<div value="" />, container);
 
       var node = container.firstChild;
-      var nodeValue = ''; // node.value always returns undefined
       var nodeValueSetter = jest.genMockFn();
-      Object.defineProperty(node, 'value', {
-        get: function() {
-          return nodeValue;
-        },
-        set: nodeValueSetter.mockImplementation(function(newValue) {
-          nodeValue = newValue;
-        }),
-      });
+
+      var oldSetAttribute = node.setAttribute.bind(node);
+      node.setAttribute = function(key, value) {
+        oldSetAttribute(key, value);
+        if(key === 'value') {
+          nodeValueSetter(key, value);
+        }
+      }
+
+      var oldRemoveAttribute = node.removeAttribute.bind(node);
+      node.removeAttribute = function(key) {
+        oldRemoveAttribute(key);
+        if(key === 'value') {
+          nodeValueSetter(key);
+        }
+      }
 
       ReactDOM.render(<div value="" />, container);
       expect(nodeValueSetter.mock.calls.length).toBe(0);
@@ -514,10 +521,10 @@ describe('ReactDOMComponent', function() {
       expect(nodeValueSetter.mock.calls.length).toBe(2);
 
       ReactDOM.render(<div value="" />, container);
-      expect(nodeValueSetter.mock.calls.length).toBe(2);
+      expect(nodeValueSetter.mock.calls.length).toBe(3);
 
       ReactDOM.render(<div />, container);
-      expect(nodeValueSetter.mock.calls.length).toBe(2);
+      expect(nodeValueSetter.mock.calls.length).toBe(4);
     });
 
     it('should not incur unnecessary DOM mutations for boolean properties', function() {
